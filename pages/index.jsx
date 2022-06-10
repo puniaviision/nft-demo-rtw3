@@ -7,11 +7,16 @@ import { NFTCard} from "./components/nftCard"
 const Home = () => {
   const [wallet, setWalletAddress] = useState("");
   const [collection, setCollectionAddress] = useState("");
-  const [NFTs, setNFTs] = useState([]);
   const [fetchForCollection, setFetchForCollection] = useState(false);
 
+  const [NFTs, setNFTs] = useState([]);
+
+  const [startToken, setStartToken] = useState("");
+
+  let counter = 0;
+
   const fetchNFTs = async() => {
-    let nfts;
+    let nfts; 
     console.log("fetching nfts");
 
     const baseURL = "https://eth-mainnet.alchemyapi.io/v2/pYJGwyv5GrN9Cwmh2BHbXS2do3IdM60y/getNFTs/"; 
@@ -37,7 +42,7 @@ const Home = () => {
     }
   }
 
-  const fetchNFTsForCollection = async () => {
+  const fetchNFTsForCollection = async (thisToken = "") => {
     if (collection.length) {
       var requestOptions = {
         method: 'GET',
@@ -45,13 +50,19 @@ const Home = () => {
       };
       
       const baseURL = "https://eth-mainnet.alchemyapi.io/v2/pYJGwyv5GrN9Cwmh2BHbXS2do3IdM60y/getNFTsForCollection/";
-      const fetchURL = `${baseURL}?contractAddress=${collection}&withMetadata=${"true"}`;
+      const fetchURL = `${baseURL}?contractAddress=${collection}&withMetadata=${"true"}&startToken=${thisToken}`;
 
-      const nfts = await fetch(fetchURL, requestOptions).then(data => data.json()); 
+      const nfts = await fetch(fetchURL, requestOptions).then(data => data.json());
+      
       if (nfts){
         console.log("NFTs in collection:", nfts);
         setNFTs(nfts.nfts);
       }
+
+      setStartToken(nfts.nextToken);
+
+      //console.log(previousToken);
+      console.log(startToken);
     }
   }
 
@@ -64,7 +75,7 @@ const Home = () => {
         <button className={"disabled:bg-slate-500 text-white bg-blue-400 px-4 py-2 mt-3 rounded-sm w-1/5"}onClick={
           () => {
             if (fetchForCollection) {
-              fetchNFTsForCollection();
+              fetchNFTsForCollection(startToken);
             } else {
               fetchNFTs();
             }
@@ -79,6 +90,23 @@ const Home = () => {
               )
             })
           }
+      </div>
+      <div>
+      <button disabled={!fetchForCollection || counter} className="disabled:bg-slate-500 text-white bg-blue-400 px-4 py-2 mt-3 rounded-sm w-1/10 inline-block mr-3" onClick={
+          () => {
+            //console.log("the previous token will be: ",previousToken);
+            fetchNFTsForCollection("");
+            counter --;
+          }
+        }>Home Page</button>
+
+        <button disabled={!fetchForCollection} className="disabled:bg-slate-500 text-white bg-blue-400 px-4 py-2 mt-3 rounded-sm w-1/10 inline-block ml-3" onClick={
+          () => {
+            //console.log("the new start token will be: ",startToken);
+            fetchNFTsForCollection(startToken);
+            counter ++;
+          }
+        }>Next Page</button>
       </div>
     </div>
   )
