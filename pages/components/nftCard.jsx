@@ -1,5 +1,9 @@
 export const NFTCard = ({ nft }) => {
 
+const copyToClipboard = (string) => {
+    navigator.clipboard.writeText(string);;
+};
+
     return (
         <div className="w-1/4 flex flex-col ">
             <div className="rounded-md">
@@ -10,7 +14,12 @@ export const NFTCard = ({ nft }) => {
                 <div className="">
                     <h2 className="text-xl text-gray-800">{nft.title}</h2>
                     <p className="text-gray-600">Id: {nft.id.tokenId.substr(nft.id.tokenId.length-4)}</p>
-                    <p className="text-gray-600">{`${nft.contract.address.substr(0,5)}...${nft.contract.address.substr(nft.contract.address.length - 4)}`}</p>
+                    <div>
+                        <p className="inline-block text-gray-600 pr-2">{`${nft.contract.address.substr(0,5)}...${nft.contract.address.substr(nft.contract.address.length - 4)}`}</p>
+                        <button onClick={copyToClipboard(nft.contract.address)}>
+                            <img className="w-3 inline-block" src="https://cdn-icons-png.flaticon.com/512/1621/1621635.png"></img>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-grow mt-2">
